@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Corrida de Leito</title>
+    <style>
+        body {
+            background-color: #0056b3;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+        }
+
+        h1 { font-size: 2.2rem; margin-bottom: 25px; }
+        h2 { font-size: 1.3rem; margin-bottom: 15px; }
+        h3 { font-size: 1rem; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.3); padding-bottom: 5px; }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .tela {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tela.ativa { display: flex; }
+
+        .btn {
+            background-color: #ffffff;
+            color: #0056b3;
+            border: none;
+            padding: 14px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            transition: transform 0.1s ease, background-color 0.2s ease;
+            width: 100%;
+        }
+
+        .btn:hover { background-color: #e6f0ff; }
+        .btn:active { transform: scale(0.98); }
+
+        .btn-add {
+            background-color: #28a745;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        .btn-add:hover { background-color: #218838; }
+
+        .btn-copiar {
+            background-color: #0056b3;
+            color: #ffffff;
+            padding: 8px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
+        .btn-apagar {
+            background-color: #dc3545;
+            color: #ffffff;
+            padding: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        .btn-apagar:hover { background-color: #c82333; }
+
+        .btn-voltar {
+            background-color: transparent;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            margin-top: 10px;
+        }
+        .btn-voltar:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        .btn-link {
+            background: none;
+            border: none;
+            color: #a3d0ff;
+            text-decoration: underline;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: bold;
+            text-align: left;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .aviso-dado {
+            font-size: 0.75rem;
+            color: #ffdddd;
+            margin-top: -5px;
+            margin-bottom: 5px;
+            line-height: 1.2;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.95rem;
+            border-radius: 8px;
+            border: none;
+            box-sizing: border-box;
+            outline: none;
+            background-color: #ffffff;
+            color: #333333;
+        }
+
+        .row-inputs {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .row-inputs > div {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-paciente {
+            font-size: 0.85rem;
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .placar-calculo {
+            background-color: rgba(255, 255, 255, 0.25);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        .campo-dinamico {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .lista-itens {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        .item-tag {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .item-tag button {
+            background: #ff4d4d;
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .card-registro {
+            background-color: #ffffff;
+            color: #333333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            text-align: left;
+        }
+
+        .card-registro h3 {
+            color: #0056b3;
+            margin: 0 0 8px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 4px;
+            text-align: left;
+        }
+
+        .card-registro p {
+            margin: 4px 0;
+            font-size: 0.85rem;
+            line-height: 1.3;
+        }
+
+        .disclaimer-legal {
+            margin-top: 25px;
+            font-size: 0.72rem;
+            text-align: center;
+            opacity: 0.9;
+            max-width: 350px;
+            line-height: 1.4;
+        }
+
+        .box-termos {
+            background-color: #ffffff;
+            color: #333333;
+            border-radius: 8px;
+            padding: 15px;
+            max-height: 50vh;
+            overflow-y: auto;
+            font-size: 0.8rem;
+            line-height: 1.4;
+            text-align: left;
+        }
+
+        .box-termos h4 {
+            margin-top: 10px;
+            margin-bottom: 4px;
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="tela-inicio" class="tela ativa">
+        <h1>Corrida de Leito</h1>
+        <div class="container">
+            <button class="btn" onclick="navegarPara('tela-box')">Registrar paciente</button>
+            <button class="btn" onclick="abrirHistorico()">Corridas realizadas</button>
+            <button class="btn-link" onclick="navegarPara('tela-politica')">Política de Privacidade & Termos de Uso</button>
+        </div>
+        <div class="disclaimer-legal">
+            <strong>Aviso Legal & Isenção de Responsabilidade:</strong> Aplicativo de produtividade e apoio organizacional para passagem de plantão. Não é um dispositivo médico regulamentado (SaMD) e não substitui o prontuário oficial nem a avaliação clínica do profissional registrado no COREN.
+        </div>
+    </div>
+
+    <!-- TELA DE POLÍTICA DE PRIVACIDADE E TERMOS DE USO (EXIGÊNCIA GOOGLE PLAY) -->
+    <div id="tela-politica" class="tela">
+        <h2>Privacidade e Termos</h2>
+        <div class="container">
+            <div class="box-termos">
+                <h4>1. POLÍTICA DE PRIVACIDADE (100% OFFLINE)</h4>
+                <p>O aplicativo <strong>Corrida de Leito</strong> foi desenvolvido com foco total na privacidade do usuário. Este aplicativo funciona de forma 100% offline e não realiza coleta, transmissão, compartilhamento ou armazenamento de dados pessoais ou médicos em servidores externos ou nuvem.</p>
+                <p>Todas as informações inseridas pelo usuário são armazenadas exclusivamente no próprio dispositivo (local storage) e podem ser apagadas a qualquer momento pelo usuário através do botão "Apagar Histórico". Recomendamos o uso exclusivo de iniciais ou identificadores de leito para preservação do sigilo do paciente (LGPD).</p>
+
+                <h4>2. LIMITAÇÃO DE RESPONSABILIDADE ("NO ESTADO EM QUE SE ENCONTRA")</h4>
+                <p>Este software é fornecido estritamente "no estado em que se encontra" (<em>as is</em>), sem garantias expressas ou implícitas de qualquer tipo. O desenvolvedor não se responsabiliza por eventuais falhas operacionais ou omissões na digitação dos dados.</p>
+
+                <h4>3. RESPONSABILIDADE TÉCNICA E COREN</h4>
+                <p>Este aplicativo é classificado exclusivamente como uma ferramenta de organização pessoal e produtividade gerencial. Ele <strong>não realiza diagnósticos automáticos, condutas terapêuticas ou prescrições</strong>. A conferência, validação e conduta assistencial prestada ao paciente é de responsabilidade técnica exclusiva do profissional de saúde devidamente habilitado e registrado em seu respectivo conselho de classe (COREN).</p>
+            </div>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-inicio')">Voltar ao Menu</button>
+        </div>
+    </div>
+
+    <div id="tela-box" class="tela">
+        <h2>Número do Box</h2>
+        <div class="container">
+            <input type="number" id="input-box" placeholder="Digite o número do box">
+            <button class="btn" onclick="confirmarBox()">Confirmar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-inicio')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-paciente" class="tela">
+        <h2>Iniciais / Identificador</h2>
+        <div class="container">
+            <input type="text" id="input-nome" placeholder="Ex: J.P.S. ou Leito 02">
+            <div class="aviso-dado">Para proteção de dados (LGPD), não insira o nome completo do paciente.</div>
+            <button class="btn" onclick="confirmarPaciente()">Confirmar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-box')">Voltar</button>
+        </div>
+    </div>
+
+    <!-- TELA DE SINAIS VITAIS -->
+    <div id="tela-vintais" class="tela">
+        <h2>Sinais Vitais</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <div class="row-inputs">
+                <div>
+                    <label>FC (bpm)</label>
+                    <input type="number" id="input-fc" placeholder="Ex: 80">
+                </div>
+                <div>
+                    <label>FR (irpm)</label>
+                    <input type="number" id="input-fr" placeholder="Ex: 18">
+                </div>
+            </div>
+
+            <div class="row-inputs">
+                <div>
+                    <label>SpO2 (%)</label>
+                    <input type="number" id="input-spo2" placeholder="Ex: 98">
+                </div>
+                <div>
+                    <label>Temp (°C)</label>
+                    <input type="number" step="0.1" id="input-temp" placeholder="Ex: 36.5">
+                </div>
+            </div>
+
+            <label>Pressão Arterial (PAS x PAD mmHg)</label>
+            <div class="row-inputs">
+                <input type="number" id="input-pas" placeholder="PAS (Ex: 120)">
+                <input type="number" id="input-pad" placeholder="PAD (Ex: 80)">
+            </div>
+
+            <label>Pressão Arterial Média (PAM)</label>
+            <input type="number" id="input-pam" placeholder="Ex: 93 (ou calculada)">
+
+            <button class="btn" onclick="confirmarVintais()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-paciente')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-neuro" class="tela">
+        <h2>Avaliação Neurológica</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <button class="btn" onclick="selecionarEscala('glasgow')">Escala de Glasgow (3-15)</button>
+            <button class="btn" onclick="selecionarEscala('rass')">Escala RASS (Intubado)</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-vintais')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-glasgow" class="tela">
+        <h2>Escala de Glasgow</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>1. Abertura Ocular</label>
+            <select id="glasgow-ocular" onchange="calcularGlasgow()">
+                <option value="">Selecione...</option>
+                <option value="4">4 - Espontânea</option>
+                <option value="3">3 - À ordem verbal</option>
+                <option value="2">2 - À pressão / dor</option>
+                <option value="1">1 - Ausente</option>
+            </select>
+
+            <label>2. Resposta Verbal</label>
+            <select id="glasgow-verbal" onchange="calcularGlasgow()">
+                <option value="">Selecione...</option>
+                <option value="5">5 - Orientado</option>
+                <option value="4">4 - Confuso</option>
+                <option value="3">3 - Palavras inapropriadas</option>
+                <option value="2">2 - Sons incompreensíveis</option>
+                <option value="1">1 - Ausente</option>
+            </select>
+
+            <label>3. Resposta Motora</label>
+            <select id="glasgow-motora" onchange="calcularGlasgow()">
+                <option value="">Selecione...</option>
+                <option value="6">6 - Obedece a comandos</option>
+                <option value="5">5 - Localiza a dor</option>
+                <option value="4">4 - Flexão normal / Retirada</option>
+                <option value="3">3 - Flexão anormal (Decorticação)</option>
+                <option value="2">2 - Extensão (Descerebração)</option>
+                <option value="1">1 - Ausente</option>
+            </select>
+
+            <div id="placar-glasgow" class="placar-calculo">Total: -- / 15</div>
+
+            <button class="btn" onclick="confirmarGlasgow()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-neuro')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-rass" class="tela">
+        <h2>Escala RASS</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <select id="select-rass">
+                <option value="">Selecione o nível RASS...</option>
+                <option value="+4">+4 Combativo</option>
+                <option value="+3">+3 Muito Agitado</option>
+                <option value="+2">+2 Agitado</option>
+                <option value="+1">+1 Inquieto</option>
+                <option value="0">0 Calmo e Alerta</option>
+                <option value="-1">-1 Soneco / Levemente Sedado</option>
+                <option value="-2">-2 Sedação Moderada</option>
+                <option value="-3">-3 Sedação Profunda</option>
+                <option value="-4">-4 Sedação Muito Profunda</option>
+                <option value="-5">-5 Indespertável</option>
+            </select>
+            <button class="btn" onclick="confirmarRass()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-neuro')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-dor-menu" class="tela">
+        <h2>Avaliação de Dor</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <button class="btn" onclick="navegarPara('tela-eva')">Escala EVA (0 a 10)</button>
+            <button class="btn" onclick="navegarPara('tela-bps')">Escala BPS (Intubado)</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-neuro')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-eva" class="tela">
+        <h2>Escala EVA (Nível de Dor)</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <select id="select-eva">
+                <option value="">Selecione o nível de dor...</option>
+                <option value="0 - Sem dor">0 - Sem dor</option>
+                <option value="1 - Dor muito leve">1 - Dor muito leve</option>
+                <option value="2 - Dor leve">2 - Dor leve</option>
+                <option value="3 - Dor tolerável">3 - Dor tolerável</option>
+                <option value="4 - Dor moderada">4 - Dor moderada</option>
+                <option value="5 - Dor moderada a forte">5 - Dor moderada a forte</option>
+                <option value="6 - Dor forte">6 - Dor forte</option>
+                <option value="7 - Dor muito forte">7 - Dor muito forte</option>
+                <option value="8 - Dor intensa">8 - Dor intensa</option>
+                <option value="9 - Dor insuportável">9 - Dor insuportável</option>
+                <option value="10 - A pior dor possível">10 - A pior dor possível</option>
+            </select>
+            <button class="btn" onclick="confirmarEva()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-dor-menu')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-bps" class="tela">
+        <h2>Escala BPS</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>1. Expressão Facial</label>
+            <select id="bps-facial" onchange="calcularBPS()">
+                <option value="">Selecione...</option>
+                <option value="1">1 - Relaxada</option>
+                <option value="2">2 - Parcialmente contraída</option>
+                <option value="3">3 - Totalmente contraída</option>
+                <option value="4">4 - Careta / Mímica expressiva</option>
+            </select>
+
+            <label>2. Membros Superiores</label>
+            <select id="bps-membros" onchange="calcularBPS()">
+                <option value="">Selecione...</option>
+                <option value="1">1 - Relaxados / Sem movimento</option>
+                <option value="2">2 - Parcialmente flexionados</option>
+                <option value="3">3 - Totalmente flexionados (retração)</option>
+                <option value="4">4 - Rigidez permanente / Contração</option>
+            </select>
+
+            <label>3. Ventilação Mecânica</label>
+            <select id="bps-ventilacao" onchange="calcularBPS()">
+                <option value="">Selecione...</option>
+                <option value="1">1 - Movimentação tolerável</option>
+                <option value="2">2 - Tosse ocasional, mas tolera</option>
+                <option value="3">3 - Luta contra o ventilador</option>
+                <option value="4">4 - Incompatibilidade total</option>
+            </select>
+
+            <div id="placar-bps" class="placar-calculo">Total BPS: -- / 12</div>
+
+            <button class="btn" onclick="confirmarBps()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-dor-menu')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-delirium" class="tela">
+        <h2>Avaliação de Delirium</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>Alteração aguda de atenção/comportamento nas últimas 24h?</label>
+            <select id="select-atencao-24h">
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+            </select>
+
+            <label>Suspeita clínica de Delirium?</label>
+            <select id="select-suspeita-delirium">
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="Não aplicável (RASS ≤ -4 ou -5)">Não aplicável (RASS ≤ -4 ou -5)</option>
+            </select>
+
+            <button class="btn" onclick="confirmarDelirium()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-dor-menu')">Voltar</button>
+        </div>
+    </div>
+
+    <!-- TELA DE EXAME FÍSICO (ABDÔMEN, CIANOSE E EDEMA) -->
+    <div id="tela-exame-fisico" class="tela">
+        <h2>Exame Físico Específico</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>Abdômen</label>
+            <select id="select-abdomen">
+                <option value="">Selecione...</option>
+                <option value="Normal / Plano">Normal / Plano</option>
+                <option value="Globoso">Globoso</option>
+                <option value="Distendido">Distendido</option>
+                <option value="Tímpânico">Tímpânico</option>
+                <option value="Doloroso à palpação">Doloroso à palpação</option>
+            </select>
+
+            <label>Cianose Extremidade (Dedos Roxos)</label>
+            <select id="select-cianose">
+                <option value="">Selecione...</option>
+                <option value="Ausente">Ausente</option>
+                <option value="Leve (Cianose periférica leve)">Leve (Dedos rosados/leve cianose)</option>
+                <option value="Moderada">Moderada (Dedos/unhas arroxeadas)</option>
+                <option value="Acentuada">Acentuada (Perfusa/Dedos bem roxos)</option>
+            </select>
+
+            <label>Edema</label>
+            <select id="select-edema" onchange="verificarEdema()">
+                <option value="">Selecione...</option>
+                <option value="Ausente">Ausente</option>
+                <option value="+/4+">+ / 4+ (Leve)</option>
+                <option value="++/4+">++ / 4+ (Moderado)</option>
+                <option value="+++/4+">+++ / 4+ (Intenso)</option>
+                <option value="++++/4+">++++ / 4+ (Muito Intenso / Anasarca)</option>
+            </select>
+
+            <div id="campo-edema-local" class="campo-dinamico">
+                <label>Localização do Edema</label>
+                <input type="text" id="input-edema-local" placeholder="Ex: Membros Inferiores, Sacral, MMII...">
+            </div>
+
+            <button class="btn" onclick="confirmarExameFisico()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-delirium')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-respiracao" class="tela">
+        <h2>Suporte Respiratório</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>Dispositivo de Oxigênio / Ventilação</label>
+            <select id="select-respiracao" onchange="verificarOpcaoRespiracao()">
+                <option value="">Selecione...</option>
+                <option value="Ar Ambiental">Ar Ambiental</option>
+                <option value="O2 (L/min)">O2 (Cateter/Cânula)</option>
+                <option value="Máscara Facial / Com Reservatório">Máscara Facial / Com Reservatório</option>
+                <option value="TOT">TOT (Tubo Orotraqueal)</option>
+                <option value="TQT">TQT (Traqueostomia)</option>
+                <option value="VM">VM (Ventilação Mecânica)</option>
+            </select>
+
+            <div id="campo-o2-litros" class="campo-dinamico">
+                <label>Fluxo de O2 (L/min)</label>
+                <input type="number" id="input-o2-litros" placeholder="Ex: 2, 5, 10..." min="1" step="0.5">
+            </div>
+
+            <button class="btn" onclick="confirmarRespiracao()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-exame-fisico')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-dispositivos" class="tela">
+        <h2>Dispositivos em Uso</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>Tipo de Dispositivo</label>
+            <select id="select-tipo-dispositivo" onchange="verificarTipoDispositivo()">
+                <option value="">Selecione...</option>
+                <option value="AVP">AVP (Acesso Venoso Periférico)</option>
+                <option value="PIA">PIA (Pressão Intra-Arterial)</option>
+                <option value="CVC">CVC (Cateter Venoso Central)</option>
+                <option value="SVD">SVD (Sonda Vesical de Demora)</option>
+                <option value="SNE/SNG">SNE / SNG (Sonda Nasoentérica/Gástrica)</option>
+                <option value="DRENO">DRENO</option>
+                <option value="OUTROS">OUTROS</option>
+            </select>
+
+            <div id="campo-outros-dispositivo" class="campo-dinamico">
+                <label>Especificar Dispositivo</label>
+                <input type="text" id="input-outro-dispositivo" placeholder="Ex: Cateter Duplo Lúmen, PICC...">
+            </div>
+
+            <button class="btn btn-add" onclick="adicionarDispositivo()">+ Adicionar Dispositivo</button>
+
+            <div id="lista-dispositivos" class="lista-itens"></div>
+
+            <button class="btn" onclick="confirmarDispositivos()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-respiracao')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-terapeutica" class="tela">
+        <h2>Terapêutica Crítica</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <label>Uso de Antibiótico?</label>
+            <select id="select-atb">
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+            </select>
+
+            <label>Droga Vasoativa (DVA)?</label>
+            <select id="select-dva">
+                <option value="">Selecione...</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+            </select>
+
+            <label>Profilaxias (Gástrica / TVE)</label>
+            <select id="select-profilaxia">
+                <option value="">Selecione...</option>
+                <option value="Adequadas">Adequadas</option>
+                <option value="Pendentes">Pendentes</option>
+                <option value="Não consta">Não consta</option>
+            </select>
+
+            <button class="btn" onclick="confirmarTerapeuta()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-dispositivos')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-alertas" class="tela">
+        <h2>Pontos de Alerta</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <div class="checkbox-group">
+                <label class="checkbox-item"><input type="checkbox" value="Exame pendente" class="check-alerta"> Exame pendente</label>
+                <label class="checkbox-item"><input type="checkbox" value="Interconsulta pendente" class="check-alerta"> Interconsulta pendente</label>
+                <label class="checkbox-item"><input type="checkbox" value="Procedimento pendente" class="check-alerta"> Procedimento pendente</label>
+                <label class="checkbox-item"><input type="checkbox" value="Não se aplica" class="check-alerta" id="check-nao-aplica" onchange="toggleNaoAplica()"> Não se aplica</label>
+            </div>
+
+            <label>Outro / Especificar Alerta</label>
+            <input type="text" id="input-especificar-alerta" placeholder="Ex: Aguardando vaga de CTI...">
+
+            <button class="btn" onclick="confirmarAlertas()">Confirmar e Avançar</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-terapeutica')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-lado" class="tela">
+        <h2>Seleção do Lado</h2>
+        <div class="resumo-paciente info-paciente"></div>
+        <div class="container">
+            <button class="btn" onclick="selecionarLadoEFinalizar('LADO A')">LADO A</button>
+            <button class="btn" onclick="selecionarLadoEFinalizar('LADO B')">LADO B</button>
+            <button class="btn btn-voltar" onclick="navegarPara('tela-alertas')">Voltar</button>
+        </div>
+    </div>
+
+    <div id="tela-historico" class="tela">
+        <h2>Corridas Realizadas</h2>
+        <div class="container">
+            <button class="btn btn-apagar" onclick="limparHistorico()">APAGAR HISTÓRICO</button>
+        </div>
+        <div id="container-historico" class="container" style="max-height: 60vh; overflow-y: auto;">
+        </div>
+        <div class="container" style="margin-top: 10px;">
+            <button class="btn btn-voltar" onclick="navegarPara('tela-inicio')">Voltar ao Menu</button>
+        </div>
+    </div>
+
+    <script>
+        let dadosRegistro = {
+            box: '',
+            paciente: '',
+            sinaisVitais: { fc: '', fr: '', spo2: '', temp: '', pa: '', pam: '' },
+            escalaNeuroTipo: '',
+            escalaNeuroValor: '',
+            escalaDorTipo: '',
+            escalaDorValor: '',
+            alteracaoAtencao24h: '',
+            suspeitaDelirium: '',
+            abdomen: '',
+            cianose: '',
+            edema: '',
+            edemaLocal: '',
+            suporteRespiratorio: '',
+            o2Litros: '',
+            dispositivos: [],
+            antibiotico: '',
+            dva: '',
+            profilaxia: '',
+            pontosAlerta: [],
+            lado: ''
+        };
+
+        function navegarPara(idTela) {
+            document.querySelectorAll('.tela').forEach(tela => tela.classList.remove('ativa'));
+            document.getElementById(idTela).classList.add('ativa');
+            
+            const resumo = `Box: ${dadosRegistro.box || '-'} | Identificador: ${dadosRegistro.paciente || '-'}`;
+            document.querySelectorAll('.resumo-paciente').forEach(el => el.innerText = resumo);
+        }
+
+        function confirmarBox() {
+            const boxVal = document.getElementById('input-box').value.trim();
+            if (!boxVal) {
+                alert('Por favor, informe o número do box.');
+                return;
+            }
+            dadosRegistro.box = boxVal;
+            navegarPara('tela-paciente');
+        }
+
+        function confirmarPaciente() {
+            const nomeVal = document.getElementById('input-nome').value.trim();
+            if (!nomeVal) {
+                alert('Por favor, informe as iniciais do paciente ou leito.');
+                return;
+            }
+            dadosRegistro.paciente = nomeVal;
+            navegarPara('tela-vintais');
+        }
+
+        function confirmarVintais() {
+            const fc = document.getElementById('input-fc').value.trim();
+            const fr = document.getElementById('input-fr').value.trim();
+            const spo2 = document.getElementById('input-spo2').value.trim();
+            const temp = document.getElementById('input-temp').value.trim();
+            const pas = document.getElementById('input-pas').value.trim();
+            const pad = document.getElementById('input-pad').value.trim();
+            let pam = document.getElementById('input-pam').value.trim();
+
+            let paFormatada = (pas && pad) ? `${pas}x${pad}` : '';
+
+            if (!pam && pas && pad) {
+                const pasNum = parseFloat(pas);
+                const padNum = parseFloat(pad);
+                if (!isNaN(pasNum) && !isNaN(padNum)) {
+                    pam = Math.round((pasNum + (2 * padNum)) / 3).toString();
+                }
+            }
+
+            dadosRegistro.sinaisVitais = {
+                fc: fc ? `${fc} bpm` : 'N/I',
+                fr: fr ? `${fr} irpm` : 'N/I',
+                spo2: spo2 ? `${spo2}%` : 'N/I',
+                temp: temp ? `${temp} °C` : 'N/I',
+                pa: paFormatada || 'N/I',
+                pam: pam ? `${pam} mmHg` : 'N/I'
+            };
+
+            navegarPara('tela-neuro');
+        }
+
+        function selecionarEscala(tipo) {
+            dadosRegistro.escalaNeuroTipo = tipo === 'glasgow' ? 'Glasgow' : 'RASS';
+            if (tipo === 'glasgow') {
+                navegarPara('tela-glasgow');
+            } else {
+                navegarPara('tela-rass');
+            }
+        }
+
+        function calcularGlasgow() {
+            const ocular = parseInt(document.getElementById('glasgow-ocular').value) || 0;
+            const verbal = parseInt(document.getElementById('glasgow-verbal').value) || 0;
+            const motora = parseInt(document.getElementById('glasgow-motora').value) || 0;
+
+            if (ocular && verbal && motora) {
+                const total = ocular + verbal + motora;
+                document.getElementById('placar-glasgow').innerText = `Total: ${total} / 15`;
+                return total;
+            } else {
+                document.getElementById('placar-glasgow').innerText = `Total: -- / 15`;
+                return null;
+            }
+        }
+
+        function confirmarGlasgow() {
+            const total = calcularGlasgow();
+            if (!total) {
+                alert('Por favor, selecione todas as 3 respostas para calcular o Glasgow.');
+                return;
+            }
+            dadosRegistro.escalaNeuroValor = `${total} Pontos`;
+            navegarPara('tela-dor-menu');
+        }
+
+        function confirmarRass() {
+            const valor = document.getElementById('select-rass').value;
+            if (!valor) {
+                alert('Por favor, selecione um nível RASS.');
+                return;
+            }
+            dadosRegistro.escalaNeuroValor = valor;
+            navegarPara('tela-dor-menu');
+        }
+
+        function confirmarEva() {
+            const valor = document.getElementById('select-eva').value;
+            if (!valor) {
+                alert('Por favor, selecione o nível da dor na escala EVA.');
+                return;
+            }
+            dadosRegistro.escalaDorTipo = 'EVA';
+            dadosRegistro.escalaDorValor = valor;
+            navegarPara('tela-delirium');
+        }
+
+        function calcularBPS() {
+            const facial = parseInt(document.getElementById('bps-facial').value) || 0;
+            const membros = parseInt(document.getElementById('bps-membros').value) || 0;
+            const ventilacao = parseInt(document.getElementById('bps-ventilacao').value) || 0;
+
+            if (facial && membros && ventilacao) {
+                const total = facial + membros + ventilacao;
+                document.getElementById('placar-bps').innerText = `Total BPS: ${total} / 12`;
+                return total;
+            } else {
+                document.getElementById('placar-bps').innerText = `Total BPS: -- / 12`;
+                return null;
+            }
+        }
+
+        function confirmarBps() {
+            const total = calcularBPS();
+            if (!total) {
+                alert('Por favor, selecione todos os 3 domínios para calcular o BPS.');
+                return;
+            }
+            dadosRegistro.escalaDorTipo = 'BPS';
+            dadosRegistro.escalaDorValor = `${total} Pontos`;
+            navegarPara('tela-delirium');
+        }
+
+        function confirmarDelirium() {
+            const atencao = document.getElementById('select-atencao-24h').value;
+            const suspeita = document.getElementById('select-suspeita-delirium').value;
+
+            if (!atencao || !suspeita) {
+                alert('Por favor, responda a ambas as perguntas de avaliação de Delirium.');
+                return;
+            }
+
+            dadosRegistro.alteracaoAtencao24h = atencao;
+            dadosRegistro.suspeitaDelirium = suspeita;
+            navegarPara('tela-exame-fisico');
+        }
+
+        function verificarEdema() {
+            const val = document.getElementById('select-edema').value;
+            const campoLocal = document.getElementById('campo-edema-local');
+            if (val && val !== 'Ausente') {
+                campoLocal.style.display = 'flex';
+            } else {
+                campoLocal.style.display = 'none';
+            }
+        }
+
+        function confirmarExameFisico() {
+            const abd = document.getElementById('select-abdomen').value;
+            const cianose = document.getElementById('select-cianose').value;
+            const edema = document.getElementById('select-edema').value;
+            const edemaLocal = document.getElementById('input-edema-local').value.trim();
+
+            if (!abd || !cianose || !edema) {
+                alert('Por favor, preencha todos os campos do exame físico.');
+                return;
+            }
+
+            dadosRegistro.abdomen = abd;
+            dadosRegistro.cianose = cianose;
+            dadosRegistro.edema = edema;
+            dadosRegistro.edemaLocal = edemaLocal;
+
+            navegarPara('tela-respiracao');
+        }
+
+        function verificarOpcaoRespiracao() {
+            const resp = document.getElementById('select-respiracao').value;
+            const campoO2 = document.getElementById('campo-o2-litros');
+            if (resp === 'O2 (L/min)') {
+                campoO2.style.display = 'flex';
+            } else {
+                campoO2.style.display = 'none';
+            }
+        }
+
+        function confirmarRespiracao() {
+            const resp = document.getElementById('select-respiracao').value;
+            if (!resp) {
+                alert('Por favor, selecione o suporte respiratório.');
+                return;
+            }
+
+            dadosRegistro.suporteRespiratorio = resp;
+
+            if (resp === 'O2 (L/min)') {
+                const litros = document.getElementById('input-o2-litros').value.trim();
+                if (!litros) {
+                    alert('Por favor, informe a quantidade de L/min.');
+                    return;
+                }
+                dadosRegistro.o2Litros = `${litros} L/min`;
+            } else {
+                dadosRegistro.o2Litros = 'N/A';
+            }
+
+            navegarPara('tela-dispositivos');
+        }
+
+        function verificarTipoDispositivo() {
+            const tipo = document.getElementById('select-tipo-dispositivo').value;
+            const campoOutro = document.getElementById('campo-outros-dispositivo');
+            if (tipo === 'OUTROS') {
+                campoOutro.style.display = 'flex';
+            } else {
+                campoOutro.style.display = 'none';
+            }
+        }
+
+        function adicionarDispositivo() {
+            const select = document.getElementById('select-tipo-dispositivo');
+            let tipo = select.value;
+
+            if (!tipo) {
+                alert('Selecione um dispositivo.');
+                return;
+            }
+
+            if (tipo === 'OUTROS') {
+                const outroTexto = document.getElementById('input-outro-dispositivo').value.trim();
+                if (!outroTexto) {
+                    alert('Especifique o nome do dispositivo.');
+                    return;
+                }
+                tipo = `OUTROS: ${outroTexto}`;
+            }
+
+            dadosRegistro.dispositivos.push(tipo);
+            
+            select.value = '';
+            document.getElementById('input-outro-dispositivo').value = '';
+            document.getElementById('campo-outros-dispositivo').style.display = 'none';
+
+            renderizarListaDispositivos();
+        }
+
+        function removerDispositivo(index) {
+            dadosRegistro.dispositivos.splice(index, 1);
+            renderizarListaDispositivos();
+        }
+
+        function renderizarListaDispositivos() {
+            const container = document.getElementById('lista-dispositivos');
+            container.innerHTML = '';
+            dadosRegistro.dispositivos.forEach((disp, idx) => {
+                const tag = document.createElement('div');
+                tag.className = 'item-tag';
+                tag.innerHTML = `<span>• ${disp}</span> <button onclick="removerDispositivo(${idx})">X</button>`;
+                container.appendChild(tag);
+            });
+        }
+
+        function confirmarDispositivos() {
+            navegarPara('tela-terapeutica');
+        }
+
+        function confirmarTerapeuta() {
+            const atb = document.getElementById('select-atb').value;
+            const dva = document.getElementById('select-dva').value;
+            const prof = document.getElementById('select-profilaxia').value;
+
+            if (!atb || !dva || !prof) {
+                alert('Por favor, preencha todos os campos da Terapêutica Crítica.');
+                return;
+            }
+
+            dadosRegistro.antibiotico = atb;
+            dadosRegistro.dva = dva;
+            dadosRegistro.profilaxia = prof;
+
+            navegarPara('tela-alertas');
+        }
+
+        function toggleNaoAplica() {
+            const naoAplica = document.getElementById('check-nao-aplica').checked;
+            document.querySelectorAll('.check-alerta').forEach(el => {
+                if (el.id !== 'check-nao-aplica') {
+                    el.disabled = naoAplica;
+                    if (naoAplica) el.checked = false;
+                }
+            });
+        }
+
+        function confirmarAlertas() {
+            const alertas = [];
+            document.querySelectorAll('.check-alerta:checked').forEach(el => alertas.push(el.value));
+            
+            const espec = document.getElementById('input-especificar-alerta').value.trim();
+            if (espec) alertas.push(`Outro: ${espec}`);
+
+            if (alertas.length === 0) {
+                alert('Por favor, selecione ao menos uma opção ou "Não se aplica".');
+                return;
+            }
+
+            dadosRegistro.pontosAlerta = alertas;
+            navegarPara('tela-lado');
+        }
+
+        function selecionarLadoEFinalizar(ladoEscolhido) {
+            dadosRegistro.lado = ladoEscolhido;
+
+            const agora = new Date();
+            const dataHoraFormatada = agora.toLocaleDateString('pt-BR') + ' às ' + agora.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+            const registroCompleto = {
+                id: Date.now(),
+                dataHora: dataHoraFormatada,
+                ...dadosRegistro
+            };
+
+            let corridas = JSON.parse(localStorage.getItem('corridas_realizadas')) || [];
+            corridas.unshift(registroCompleto);
+            localStorage.setItem('corridas_realizadas', JSON.stringify(corridas));
+
+            alert('Corrida de leito registrada com sucesso!');
+            resetarFormulario();
+            navegarPara('tela-inicio');
+        }
+
+        function resetarFormulario() {
+            document.getElementById('input-box').value = '';
+            document.getElementById('input-nome').value = '';
+
+            document.getElementById('input-fc').value = '';
+            document.getElementById('input-fr').value = '';
+            document.getElementById('input-spo2').value = '';
+            document.getElementById('input-temp').value = '';
+            document.getElementById('input-pas').value = '';
+            document.getElementById('input-pad').value = '';
+            document.getElementById('input-pam').value = '';
+
+            document.getElementById('glasgow-ocular').value = '';
+            document.getElementById('glasgow-verbal').value = '';
+            document.getElementById('glasgow-motora').value = '';
+            document.getElementById('select-rass').value = '';
+            document.getElementById('select-eva').value = '';
+            document.getElementById('bps-facial').value = '';
+            document.getElementById('bps-membros').value = '';
+            document.getElementById('bps-ventilacao').value = '';
+            document.getElementById('select-atencao-24h').value = '';
+            document.getElementById('select-suspeita-delirium').value = '';
+
+            document.getElementById('select-abdomen').value = '';
+            document.getElementById('select-cianose').value = '';
+            document.getElementById('select-edema').value = '';
+            document.getElementById('input-edema-local').value = '';
+            document.getElementById('campo-edema-local').style.display = 'none';
+
+            document.getElementById('select-respiracao').value = '';
+            document.getElementById('input-o2-litros').value = '';
+            document.getElementById('campo-o2-litros').style.display = 'none';
+            document.getElementById('select-tipo-dispositivo').value = '';
+            document.getElementById('input-outro-dispositivo').value = '';
+            document.getElementById('lista-dispositivos').innerHTML = '';
+            document.getElementById('select-atb').value = '';
+            document.getElementById('select-dva').value = '';
+            document.getElementById('select-profilaxia').value = '';
+            document.querySelectorAll('.check-alerta').forEach(el => { el.checked = false; el.disabled = false; });
+            document.getElementById('input-especificar-alerta').value = '';
+
+            document.getElementById('placar-glasgow').innerText = 'Total: -- / 15';
+            document.getElementById('placar-bps').innerText = 'Total BPS: -- / 12';
+
+            dadosRegistro = {
+                box: '', paciente: '', sinaisVitais: { fc: '', fr: '', spo2: '', temp: '', pa: '', pam: '' },
+                escalaNeuroTipo: '', escalaNeuroValor: '', escalaDorTipo: '', escalaDorValor: '',
+                alteracaoAtencao24h: '', suspeitaDelirium: '', abdomen: '', cianose: '',
+                edema: '', edemaLocal: '', suporteRespiratorio: '', o2Litros: '',
+                dispositivos: [], antibiotico: '', dva: '', profilaxia: '', pontosAlerta: [], lado: ''
+            };
+        }
+
+        function abrirHistorico() {
+            const container = document.getElementById('container-historico');
+            container.innerHTML = '';
+
+            const corridas = JSON.parse(localStorage.getItem('corridas_realizadas')) || [];
+
+            if (corridas.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">Nenhuma corrida realizada ainda.</p>';
+            } else {
+                corridas.forEach((item, index) => {
+                    let respText = item.suporteRespiratorio;
+                    if (item.o2Litros !== 'N/A') respText += ` (${item.o2Litros})`;
+
+                    const dispText = item.dispositivos.length > 0 ? item.dispositivos.join(', ') : 'Nenhum';
+                    const alertText = item.pontosAlerta.join(', ');
+                    const sv = item.sinaisVitais || {};
+                    let edemaText = item.edema;
+                    if (item.edemaLocal) edemaText += ` (${item.edemaLocal})`;
+
+                    const card = document.createElement('div');
+                    card.className = 'card-registro';
+                    card.innerHTML = `
+                        <h3>Box ${item.box} - ${item.paciente} (${item.lado})</h3>
+                        <p><strong>Data/Hora:</strong> ${item.dataHora}</p>
+                        <p><strong>Sinais Vitais:</strong> FC: ${sv.fc || '-'} | FR: ${sv.fr || '-'} | SpO2: ${sv.spo2 || '-'} | T: ${sv.temp || '-'}</p>
+                        <p><strong>Hemodinâmica:</strong> PA: ${sv.pa || '-'} | PAM: ${sv.pam || '-'}</p>
+                        <p><strong>Neurológico:</strong> ${item.escalaNeuroTipo} (${item.escalaNeuroValor})</p>
+                        <p><strong>Dor:</strong> ${item.escalaDorTipo} (${item.escalaDorValor})</p>
+                        <p><strong>Delirium:</strong> Alt. 24h: ${item.alteracaoAtencao24h} | Suspeita: ${item.suspeitaDelirium}</p>
+                        <p><strong>Exame Físico:</strong> Abdômen: ${item.abdomen} | Cianose Ext.: ${item.cianose} | Edema: ${edemaText}</p>
+                        <p><strong>Respiratório:</strong> ${respText}</p>
+                        <p><strong>Dispositivos:</strong> ${dispText}</p>
+                        <p><strong>Terapêutica:</strong> ATB: ${item.antibiotico} | DVA: ${item.dva} | Prof: ${item.profilaxia}</p>
+                        <p><strong>Alertas:</strong> ${alertText}</p>
+                        <button class="btn btn-copiar" onclick="copiarRegistro(${index})">📋 Copiar Resumo</button>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            navegarPara('tela-historico');
+        }
+
+        function copiarRegistro(index) {
+            const corridas = JSON.parse(localStorage.getItem('corridas_realizadas')) || [];
+            const item = corridas[index];
+            if (!item) return;
+
+            let respText = item.suporteRespiratorio;
+            if (item.o2Litros !== 'N/A') respText += ` (${item.o2Litros})`;
+            const dispText = item.dispositivos.length > 0 ? item.dispositivos.join(', ') : 'Nenhum';
+            const alertText = item.pontosAlerta.join(', ');
+            const sv = item.sinaisVitais || {};
+            let edemaText = item.edema;
+            if (item.edemaLocal) edemaText += ` (${item.edemaLocal})`;
+
+            const textoFormatado = 
+`📌 *CORRIDA DE LEITO*
+📍 *Box:* ${item.box} | *ID:* ${item.paciente} (${item.lado})
+🕒 *Data:* ${item.dataHora}
+📊 *SSVV:* FC: ${sv.fc} | FR: ${sv.fr} | SpO2: ${sv.spo2} | T: ${sv.temp}
+🩺 *PA:* ${sv.pa} | *PAM:* ${sv.pam}
+🧠 *Neuro:* ${item.escalaNeuroTipo} (${item.escalaNeuroValor})
+⚡ *Dor:* ${item.escalaDorTipo} (${item.escalaDorValor})
+🌀 *Delirium:* Alt. 24h: ${item.alteracaoAtencao24h} | Suspeita: ${item.suspeitaDelirium}
+🔍 *Exame Físico:* Abdômen: ${item.abdomen} | Cianose Ext.: ${item.cianose} | Edema: ${edemaText}
+🫁 *Respiratório:* ${respText}
+🔌 *Dispositivos:* ${dispText}
+💊 *Terapêutica:* ATB: ${item.antibiotico} | DVA: ${item.dva} | Prof: ${item.profilaxia}
+⚠️ *Alertas:* ${alertText}`;
+
+            navigator.clipboard.writeText(textoFormatado).then(() => {
+                alert('Resumo copiado com sucesso!');
+            }).catch(() => {
+                alert('Não foi possível copiar automaticamente.');
+            });
+        }
+
+        function limparHistorico() {
+            const corridas = JSON.parse(localStorage.getItem('corridas_realizadas')) || [];
+            if (corridas.length === 0) {
+                alert('Não há histórico para apagar.');
+                return;
+            }
+
+            if (confirm('Tem certeza de que deseja apagar todas as corridas realizadas?')) {
+                localStorage.removeItem('corridas_realizadas');
+                abrirHistorico();
+            }
+        }
+    </script>
+
+</body>
+</html>
